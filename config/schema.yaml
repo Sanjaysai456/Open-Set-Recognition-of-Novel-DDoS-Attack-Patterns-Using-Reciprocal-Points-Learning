@@ -1,0 +1,132 @@
+columns:
+  - Protocol: int
+  - Flow Duration: int
+  - Total Fwd Packets: int
+  - Total Backward Packets: int
+  - Fwd Packets Length Total: int
+  - Bwd Packets Length Total: int
+  - Fwd Packet Length Max: int
+  - Fwd Packet Length Min: int
+  - Fwd Packet Length Mean: float
+  - Fwd Packet Length Std: float
+  - Bwd Packet Length Max: int
+  - Bwd Packet Length Min: int
+  - Bwd Packet Length Mean: float
+  - Bwd Packet Length Std: float
+  - Flow Bytes/s: float
+  - Flow Packets/s: float
+  - Flow IAT Mean: float
+  - Flow IAT Std: float
+  - Flow IAT Max: float
+  - Flow IAT Min: float
+  - Fwd IAT Total: float
+  - Fwd IAT Mean: float
+  - Fwd IAT Std: float
+  - Fwd IAT Max: float
+  - Fwd IAT Min: float
+  - Bwd IAT Total: float
+  - Bwd IAT Mean: float
+  - Bwd IAT Std: float
+  - Bwd IAT Max: float
+  - Bwd IAT Min: float
+  - Fwd PSH Flags: int
+  - Bwd PSH Flags: int
+  - Fwd URG Flags: int
+  - Bwd URG Flags: int
+  - Fwd Header Length: int
+  - Bwd Header Length: int
+  - Fwd Packets/s: float
+  - Bwd Packets/s: float
+  - Packet Length Min: int
+  - Packet Length Max: int
+  - Packet Length Mean: float
+  - Packet Length Std: float
+  - Packet Length Variance: float
+  - FIN Flag Count: int
+  - SYN Flag Count: int
+  - RST Flag Count: int
+  - PSH Flag Count: int
+  - ACK Flag Count: int
+  - URG Flag Count: int
+  - CWE Flag Count: int
+  - ECE Flag Count: int
+  - Down/Up Ratio: float
+  - Avg Packet Size: float
+  - Avg Fwd Segment Size: float
+  - Avg Bwd Segment Size: float
+  - Fwd Avg Bytes/Bulk: float
+  - Fwd Avg Packets/Bulk: float
+  - Fwd Avg Bulk Rate: float
+  - Bwd Avg Bytes/Bulk: float
+  - Bwd Avg Packets/Bulk: float
+  - Bwd Avg Bulk Rate: float
+  - Subflow Fwd Packets: int
+  - Subflow Fwd Bytes: int
+  - Subflow Bwd Packets: int
+  - Subflow Bwd Bytes: int
+  - Init Fwd Win Bytes: int
+  - Init Bwd Win Bytes: int
+  - Fwd Act Data Packets: int
+  - Fwd Seg Size Min: int
+  - Active Mean: float
+  - Active Std: float
+  - Active Max: float
+  - Active Min: float
+  - Idle Mean: float
+  - Idle Std: float
+  - Idle Max: float
+  - Idle Min: float
+  - Label: category
+numerical_columns:
+  - Protocol
+  - Flow Duration
+  - Total Fwd Packets
+  - Total Backward Packets
+  - Fwd Packets Length Total
+  - Bwd Packets Length Total
+  - Fwd Packet Length Max
+  - Fwd Packet Length Min
+  - Fwd Packet Length Mean
+  - Fwd Packet Length Std
+  - Bwd Packet Length Max
+  - Bwd Packet Length Min
+  - Bwd Packet Length Mean
+  - Bwd Packet Length Std
+  - Flow Bytes/s
+  - Flow Packets/s
+  - Flow IAT Mean
+  - Flow IAT Std
+  - Flow IAT Max
+  - Flow IAT Min
+  - Fwd IAT Total
+  - Fwd IAT Mean
+  - Fwd IAT Std
+  - Fwd IAT Max
+  - Fwd IAT Min
+  - Bwd IAT Total
+  - Bwd IAT Mean
+  - Bwd IAT Std
+  - Bwd IAT Max
+  - Bwd IAT Min
+  - Fwd Packets/s
+  - Bwd Packets/s
+  - Packet Length Min
+  - Packet Length Max
+  - Packet Length Mean
+  - Packet Length Std
+  - Packet Length Variance
+  - Down/Up Ratio
+  - Avg Packet Size
+  - Avg Fwd Segment Size
+  - Avg Bwd Segment Size
+  - Active Mean
+  - Active Std
+  - Active Max
+  - Active Min
+  - Idle Mean
+  - Idle Std
+  - Idle Max
+  - Idle Min
+categorical_columns:
+  - Label
+drop_columns: _id
