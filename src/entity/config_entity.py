@@ -41,10 +41,16 @@ class DataTransformationConfig:
 
 class ModelTrainerConfig:
     model_trainer_dir = os.path.join(training_pipeline_config.artifact_dir, MODEL_TRAINER_DIR_NAME)
+
     trained_model_file_path = os.path.join(
         model_trainer_dir,
         MODEL_TRAINER_TRAINED_MODEL_DIR,
         MODEL_FILE_NAME
+    )
+
+    centroid_file_path = os.path.join(
+        model_trainer_dir,
+        "centroids.pkl"
     )
 
     expected_accuracy = MODEL_TRAINER_EXPECTED_SCORE
@@ -56,3 +62,20 @@ class ModelTrainerConfig:
     _bootstrap = MODEL_TRAINER_BOOTSTRAP
     _max_features = MODEL_TRAINER_MAX_FEATURES
     _random_state = MODEL_TRAINER_RANDOM_STATE
+
+
+@dataclass
+class ModelPusherConfig:
+    bucket_name: str = MODEL_BUCKET_NAME
+    s3_model_key_path: str = MODEL_FILE_NAME
+
+@dataclass
+class VehiclePredictorConfig:
+    model_file_path: str = MODEL_FILE_NAME
+    model_bucket_name: str = MODEL_BUCKET_NAME
+
+@dataclass
+class ModelEvaluationConfig:
+    bucket_name: str = MODEL_BUCKET_NAME
+    s3_model_key_path: str = MODEL_PUSHER_S3_KEY
+    changed_threshold_score: float = MODEL_EVALUATION_CHANGED_THRESHOLD_SCORE
