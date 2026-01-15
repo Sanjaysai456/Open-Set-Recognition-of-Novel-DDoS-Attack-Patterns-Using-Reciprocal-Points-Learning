@@ -1,76 +1,64 @@
 import sys
 import numpy as np
 import pandas as pd
-from pandas import DataFrame
 
 from src.exception import MyException
 from src.logger import logging
 
 
-class TargetValueMapping:
-    def __init__(self):
-        self.yes: int = 0
-        self.no: int = 1
-
-    def _asdict(self):
-        return self.__dict__
-
-    def reverse_mapping(self):
-        mapping_response = self._asdict()
-        return dict(zip(mapping_response.values(), mapping_response.keys()))
-
-
 class MyModel:
-    def __init__(self, preprocessing_object, trained_model_object, centroids, threshold=5.0):
-        """
-        preprocessing_object : fitted sklearn Pipeline
-        trained_model_object : trained classifier
-        centroids            : class centroids (RPL)
-        threshold            : distance threshold for UNKNOWN detection
-        """
+    def __init__(
+        self,
+        preprocessing_object,
+        trained_model_object,
+        centroids,
+        feature_columns,
+        threshold=5.0
+    ):
         self.preprocessing_object = preprocessing_object
         self.trained_model_object = trained_model_object
         self.centroids = centroids
+        self.feature_columns = feature_columns  # ALL 77 numerical columns
         self.threshold = threshold
 
-    def predict(self, dataframe: pd.DataFrame) -> DataFrame:
-        """
-        Open-set prediction:
-        1. Transform input
-        2. Check distance to centroids
-        3. If far → UNKNOWN
-        4. Else → classifier prediction
-        """
+    def predict(self, dataframe: pd.DataFrame):
         try:
-            logging.info("Starting open-set prediction process")
+            logging.info("Starting prediction")
 
-            # Transform input
-            X = self.preprocessing_object.transform(dataframe)
+            # 1️⃣ Reconstruct full feature vector using the index of the input dataframe
+            # This ensures we handle batch predictions correctly
+            full_df = pd.DataFrame(0.0, index=dataframe.index, columns=self.feature_columns)
 
-            final_predictions = []
+            for col in self.feature_columns:
+                if col in dataframe.columns:
+                    full_df[col] = dataframe[col]
 
-            for x in X:
-                # Compute distances to centroids
+            # 2️⃣ Convert to NumPy (pipeline was fit on NumPy)
+            X = full_df.to_numpy(dtype=float)
+
+            # 3️⃣ Apply SAME pipeline (scaler + selector)
+            X_transformed = self.preprocessing_object.transform(X)
+
+            # 4️⃣ Model prediction
+            preds = self.trained_model_object.predict(X_transformed)
+
+            # 5️⃣ Open-set logic
+            final_preds = []
+            for x, pred in zip(X_transformed, preds):
                 distances = [
                     np.linalg.norm(x - self.centroids[c])
                     for c in self.centroids
                 ]
 
-                # UNKNOWN detection
                 if min(distances) > self.threshold:
-                    final_predictions.append("UNKNOWN")
+                    final_preds.append("UNKNOWN")
                 else:
-                    pred = self.trained_model_object.predict([x])[0]
-                    final_predictions.append(pred)
+                    final_preds.append(int(pred))
 
-            return final_predictions
+            return final_preds
 
         except Exception as e:
-            logging.error("Error occurred in MyModel.predict", exc_info=True)
-            raise MyException(e, sys) from e
+            raise MyException(e, sys)
 
     def __repr__(self):
-        return f"{type(self.trained_model_object).__name__}(OpenSetEnabled)"
-
-    def __str__(self):
         return f"{type(self.trained_model_object).__name__}(OpenSetEnabled)"

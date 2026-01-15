@@ -1,154 +1,117 @@
 import json
 import sys
 import os
-
 import pandas as pd
-
 from pandas import DataFrame
 
 from src.exception import MyException
 from src.logger import logging
 from src.utils.main_utils import read_yaml_file
-from src.entity.artifact_entity import DataIngestionArtifact, DataValidationArtifact
+from src.entity.artifact_entity import (
+    DataIngestionArtifact,
+    DataValidationArtifact
+)
 from src.entity.config_entity import DataValidationConfig
-from src.constants import SCHEMA_FILE_PATH
+from src.constants import SCHEMA_FILE_PATH, TARGET_COLUMN
 
 
 class DataValidation:
-    def __init__(self, data_ingestion_artifact: DataIngestionArtifact, data_validation_config: DataValidationConfig):
-        """
-        :param data_ingestion_artifact: Output reference of data ingestion artifact stage
-        :param data_validation_config: configuration for data validation
-        """
+    def __init__(
+        self,
+        data_ingestion_artifact: DataIngestionArtifact,
+        data_validation_config: DataValidationConfig
+    ):
         try:
             self.data_ingestion_artifact = data_ingestion_artifact
             self.data_validation_config = data_validation_config
-            self._schema_config =read_yaml_file(file_path=SCHEMA_FILE_PATH)
+            self._schema_config = read_yaml_file(file_path=SCHEMA_FILE_PATH)
         except Exception as e:
-            raise MyException(e,sys)
+            raise MyException(e, sys)
 
-    def validate_number_of_columns(self, dataframe: DataFrame) -> bool:
-        """
-        Method Name :   validate_number_of_columns
-        Description :   This method validates the number of columns
-        
-        Output      :   Returns bool value based on validation results
-        On Failure  :   Write an exception log and then raise an exception
-        """
+    @staticmethod
+    def read_data(file_path: str) -> DataFrame:
         try:
-            status = len(dataframe.columns) == len(self._schema_config["columns"])
-            logging.info(f"Is required column present: [{status}]")
-            return status
+            df = pd.read_csv(file_path)
+            if "_id" in df.columns:
+                df.drop(columns=["_id"], inplace=True)
+                logging.info("Dropped _id column")
+            return df
         except Exception as e:
             raise MyException(e, sys)
 
     def is_column_exist(self, df: DataFrame) -> bool:
-        """
-        Method Name :   is_column_exist
-        Description :   This method validates the existence of a numerical and categorical columns
-        
-        Output      :   Returns bool value based on validation results
-        On Failure  :   Write an exception log and then raise an exception
-        """
         try:
-            dataframe_columns = df.columns
-            missing_numerical_columns = []
-            missing_categorical_columns = []
-            for column in self._schema_config["numerical_columns"]:
-                if column not in dataframe_columns:
-                    missing_numerical_columns.append(column)
+            dataframe_columns = set(df.columns)
 
-            if len(missing_numerical_columns)>0:
-                logging.info(f"Missing numerical column: {missing_numerical_columns}")
+            # ✅ ONLY validate numerical columns
+            missing_numerical = [
+                col for col in self._schema_config["numerical_columns"]
+                if col not in dataframe_columns
+            ]
 
+            if missing_numerical:
+                logging.error(f"Missing numerical columns: {missing_numerical}")
 
-            for column in self._schema_config["categorical_columns"]:
-                if column not in dataframe_columns:
-                    missing_categorical_columns.append(column)
+            if TARGET_COLUMN not in dataframe_columns:
+                logging.error(f"Target column {TARGET_COLUMN} missing")
+                return False
 
-            if len(missing_categorical_columns)>0:
-                logging.info(f"Missing categorical column: {missing_categorical_columns}")
+            return not missing_numerical
 
-            return False if len(missing_categorical_columns)>0 or len(missing_numerical_columns)>0 else True
-        except Exception as e:
-            raise MyException(e, sys) from e
-
-    @staticmethod
-    def read_data(file_path) -> DataFrame:
-        try:
-            df= pd.read_csv(file_path)
-            if "_id" in df.columns:
-                df.drop(columns=["_id"], inplace=True)
-                logging.info("Dropped _id column from dataset")
-            return df
         except Exception as e:
             raise MyException(e, sys)
-        
+
+    def _reorder_columns(self, df: DataFrame) -> DataFrame:
+        ordered_cols = self._schema_config["numerical_columns"] + [TARGET_COLUMN]
+        return df[ordered_cols]
 
     def initiate_data_validation(self) -> DataValidationArtifact:
-        """
-        Method Name :   initiate_data_validation
-        Description :   This method initiates the data validation component for the pipeline
-        
-        Output      :   Returns bool value based on validation results
-        On Failure  :   Write an exception log and then raise an exception
-        """
-
         try:
-            validation_error_msg = ""
             logging.info("Starting data validation")
-            train_df, test_df = (DataValidation.read_data(file_path=self.data_ingestion_artifact.trained_file_path),
-                                 DataValidation.read_data(file_path=self.data_ingestion_artifact.test_file_path))
 
-            # Checking col len of dataframe for train/test df
-            status = self.validate_number_of_columns(dataframe=train_df)
-            if not status:
-                validation_error_msg += f"Columns are missing in training dataframe. "
-            else:
-                logging.info(f"All required columns present in training dataframe: {status}")
+            train_df = self.read_data(self.data_ingestion_artifact.trained_file_path)
+            test_df = self.read_data(self.data_ingestion_artifact.test_file_path)
 
-            status = self.validate_number_of_columns(dataframe=test_df)
-            if not status:
-                validation_error_msg += f"Columns are missing in test dataframe. "
-            else:
-                logging.info(f"All required columns present in testing dataframe: {status}")
+            error_msg = ""
 
-            # Validating col dtype for train/test df
-            status = self.is_column_exist(df=train_df)
-            if not status:
-                validation_error_msg += f"Columns are missing in training dataframe. "
-            else:
-                logging.info(f"All categorical/int columns present in training dataframe: {status}")
+            if not self.is_column_exist(train_df):
+                error_msg += "Missing required numerical columns in training data. "
 
-            status = self.is_column_exist(df=test_df)
-            if not status:
-                validation_error_msg += f"Columns are missing in test dataframe."
-            else:
-                logging.info(f"All categorical/int columns present in testing dataframe: {status}")
+            if not self.is_column_exist(test_df):
+                error_msg += "Missing required numerical columns in test data. "
 
-            validation_status = len(validation_error_msg) == 0
+            if error_msg == "":
+                train_df = self._reorder_columns(train_df)
+                test_df = self._reorder_columns(test_df)
 
-            data_validation_artifact = DataValidationArtifact(
+                train_df.to_csv(self.data_ingestion_artifact.trained_file_path, index=False)
+                test_df.to_csv(self.data_ingestion_artifact.test_file_path, index=False)
+
+            validation_status = error_msg == ""
+
+            os.makedirs(
+                os.path.dirname(self.data_validation_config.validation_report_file_path),
+                exist_ok=True
+            )
+
+            with open(self.data_validation_config.validation_report_file_path, "w") as f:
+                json.dump(
+                    {
+                        "validation_status": validation_status,
+                        "message": error_msg.strip()
+                    },
+                    f,
+                    indent=4
+                )
+
+            artifact = DataValidationArtifact(
                 validation_status=validation_status,
-                message=validation_error_msg,
+                message=error_msg.strip(),
                 validation_report_file_path=self.data_validation_config.validation_report_file_path
             )
 
-            # Ensure the directory for validation_report_file_path exists
-            report_dir = os.path.dirname(self.data_validation_config.validation_report_file_path)
-            os.makedirs(report_dir, exist_ok=True)
+            logging.info(f"Data validation completed: {artifact}")
+            return artifact
 
-            # Save validation status and message to a JSON file
-            validation_report = {
-                "validation_status": validation_status,
-                "message": validation_error_msg.strip()
-            }
-
-            with open(self.data_validation_config.validation_report_file_path, "w") as report_file:
-                json.dump(validation_report, report_file, indent=4)
-
-            logging.info("Data validation artifact created and saved to JSON file.")
-            logging.info(f"Data validation artifact: {data_validation_artifact}")
-            return data_validation_artifact
         except Exception as e:
-            raise MyException(e, sys) from e
+            raise MyException(e, sys)

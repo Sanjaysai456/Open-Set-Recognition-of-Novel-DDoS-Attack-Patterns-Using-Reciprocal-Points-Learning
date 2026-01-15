@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Open-Set DDoS Detection</title>
+    <style>
+        body { font-family: Arial; background: #f4f6f8; }
+        h2 { text-align: center; }
+        form {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        input {
+            padding: 8px;
+            width: 100%;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+        }
+        .result {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+<h2>Open-Set DDoS Detection (RPL)</h2>
+
+<form method="post" action="/predict">
+    <div class="grid">
+        <input name="Protocol" placeholder="Protocol" required>
+        <input name="Flow Duration" placeholder="Flow Duration" required>
+
+        <input name="Total Fwd Packets" placeholder="Total Fwd Packets" required>
+        <input name="Total Backward Packets" placeholder="Total Backward Packets" required>
+
+        <input name="Fwd Packets Length Total" placeholder="Fwd Packets Length Total" required>
+        <input name="Bwd Packets Length Total" placeholder="Bwd Packets Length Total" required>
+
+        <input name="Fwd Packet Length Max" placeholder="Fwd Packet Length Max" required>
+        <input name="Fwd Packet Length Min" placeholder="Fwd Packet Length Min" required>
+
+        <input name="Fwd Packet Length Mean" placeholder="Fwd Packet Length Mean" required>
+        <input name="Fwd Packet Length Std" placeholder="Fwd Packet Length Std" required>
+
+        <input name="Bwd Packet Length Max" placeholder="Bwd Packet Length Max" required>
+        <input name="Bwd Packet Length Min" placeholder="Bwd Packet Length Min" required>
+
+        <input name="Bwd Packet Length Mean" placeholder="Bwd Packet Length Mean" required>
+        <input name="Bwd Packet Length Std" placeholder="Bwd Packet Length Std" required>
+
+        <input name="Flow Bytes/s" placeholder="Flow Bytes/s" required>
+        <input name="Flow Packets/s" placeholder="Flow Packets/s" required>
+
+        <input name="Flow IAT Mean" placeholder="Flow IAT Mean" required>
+        <input name="Flow IAT Std" placeholder="Flow IAT Std" required>
+
+        <input name="Flow IAT Max" placeholder="Flow IAT Max" required>
+        <input name="Flow IAT Min" placeholder="Flow IAT Min" required>
+    </div>
+
+    <button type="submit">Predict</button>
+
+    {% if result %}
+    <div class="result">
+        Prediction: {{ result }}
+    </div>
+    {% endif %}
+</form>
+
+</body>
+</html>
