@@ -129,11 +129,11 @@
         >> To crosscheck, go back to Github and click on Runner and you will see runner state as "idle"
         >> If you do ctrl+c on EC2 server then runner will shut then restart with "./run.sh"
 
-30. Setup your Github secrets: (Github project>Settings>SecretandVariable>Actions>NewRepoSecret)
+30. Setup your Github secrets: (Github project>Settings>SecretandVariable>Actions>NewRepoSecret))
       AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY
       AWS_DEFAULT_REGION
-      ECR_REPO
+      ECR_REPO 
 
 31. CI-CD pipeline will be triggered at next commit and push.
 32. Now we need to activate the 5000 port of our EC2 instance:
