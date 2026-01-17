@@ -118,7 +118,7 @@
       curl -fsSL https://get.docker.com -o get-docker.sh
       sudo sh get-docker.sh
       sudo usermod -aG docker ubuntu
-      newgrp docker
+      newgrp docker 
 
 29. Next step is to connect Github with EC2(Self hosted runner):
       * select your project on Github >> go to settings >> Actions >> Runner >> New self hosted runner
@@ -130,7 +130,7 @@
         >> If you do ctrl+c on EC2 server then runner will shut then restart with "./run.sh"
 
 30. Setup your Github secrets: (Github project>Settings>SecretandVariable>Actions>NewRepoSecret))
-      AWS_ACCESS_KEY_ID
+      AWS_ACCESS_KEY_ID ,
       AWS_SECRET_ACCESS_KEY
       AWS_DEFAULT_REGION
       ECR_REPO 
