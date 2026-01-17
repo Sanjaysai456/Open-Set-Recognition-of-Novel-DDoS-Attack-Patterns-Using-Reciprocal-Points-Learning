@@ -1,3 +1,4 @@
+
 pandas
 numpy
 scikit-learn
@@ -12,26 +13,42 @@ fastapi
 python-multipart
 uvicorn
 jinja2
+python-dotenv
 
-
-# ipykernel
 # pandas
 # numpy
-# matplotlib
-# plotly
-# seaborn
 # scikit-learn
+# imbalanced-learn
 # pymongo
-# from_root
 # dill
 # certifi
 # PyYAML
 # boto3
-# mypy-boto3-s3
 # botocore
 # fastapi
 # python-multipart
 # uvicorn
 # jinja2
-# imblearn
-# -e .
+
+
+# # ipykernel
+# # pandas
+# # numpy
+# # matplotlib
+# # plotly
+# # seaborn
+# # scikit-learn
+# # pymongo
+# # from_root
+# # dill
+# # certifi
+# # PyYAML
+# # boto3
+# # mypy-boto3-s3
+# # botocore
+# # fastapi
+# # python-multipart
+# # uvicorn
+# # jinja2
+# # imblearn
+# # -e .
