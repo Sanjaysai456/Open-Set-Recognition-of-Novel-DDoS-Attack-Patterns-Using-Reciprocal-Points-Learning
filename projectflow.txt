@@ -2,8 +2,8 @@
 2. Write the code on setup.py and pyproject.toml file to import local packages
    >> Find more about "setup.py and pyproject.toml" at crashcourse.txt
 3. Create a virtual env, activate it and install the requirements from requirements.txt
-   conda create -n vehicle python=3.10 -y
-   conda activate vehicle
+   conda create -n openset python=3.10 -y
+   conda activate openset
    add required modules to requirements.txt
    Do "pip install -r requirements.txt"
 4. Do a "pip list" on terminal to make sure you have local packages installed.
@@ -15,7 +15,7 @@
 8. Go to "network access" and add ip address - "0.0.0.0/0" so that we can access it from anywhere
 9. Go back to project >> "Get Connection String" >> "Drivers" >> {Driver:Python, Version:3.6 or later} 
    >> copy and save the connection string with you(replace password). >> Done.
-10. Create folder "notebook" >> do step 11 >>  create file "mongoDB_demo.ipynb" >> select kernal>python kernal>vehicle>>
+10. Create folder "notebook" >> do step 11 >>  create file "mongoDB_demo.ipynb" >> select kernal>python kernal>openset>>
 11. Dataset added to notebook folder
 12. Push your data to mongoDB database from your python notebook.
 13. Go to mongoDB Atlas >> Database >> browse collection >> see your data in key value format
@@ -103,8 +103,8 @@
         >> next >> create access key >> download csv
       * Now create one ECR repo to store/save docker image:
         AWS console >> Go to ECR >> Region: us-east-1 >> Hit create repository >>
-        repo name: vehicleproj >> hit create repository >> copy and keep uri
-      * Now create EC2 Ubuntu server >> AWS console >> EC2 >> Launch Instance >> name: vehicledata-machine
+        repo name: opensetproj >> hit create repository >> copy and keep uri
+      * Now create EC2 Ubuntu server >> AWS console >> EC2 >> Launch Instance >> name: ddosdata
         >> Image: Ubuntu >> AMI: Ubuntu Server 24.04 (free tier) >> Instance: T2 Medium (~chargeable-3.5rs/hr)
         >> create new key pair (name: proj1key) >> allow for https and http traffic >> storage: 30gb >> Launch
         >> Go to instance >> click on "Connect" >> Connect using EC2 Instance Connect 
