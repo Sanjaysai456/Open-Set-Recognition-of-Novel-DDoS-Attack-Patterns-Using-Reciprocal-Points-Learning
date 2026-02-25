@@ -3,83 +3,157 @@
 <head>
     <title>Open-Set DDoS Detection</title>
     <style>
-        body { font-family: Arial; background: #f4f6f8; }
-        h2 { text-align: center; }
-        form {
-            max-width: 900px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            margin: 0;
+            padding: 0;
         }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 5px;
+            color: #1e3c72;
+        }
+
+        .desc {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #555;
+        }
+
         .grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        input {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .buttons {
+            margin-top: 20px;
+            display: flex;
             gap: 10px;
         }
-        input {
-            padding: 8px;
-            width: 100%;
-        }
+
         button {
-            margin-top: 20px;
-            padding: 10px;
-            width: 100%;
-            font-size: 16px;
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
         }
+
+        .predict {
+            background: #1e3c72;
+            color: white;
+        }
+
+        .normal-btn {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .attack-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
         .result {
-            margin-top: 20px;
+            margin-top: 25px;
             text-align: center;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
         }
     </style>
 </head>
 
 <body>
-<h2>Open-Set DDoS Detection_(RPL)</h2>
+<div class="container">
 
-<form method="post" action="/predict">
-    <div class="grid">
-        <input name="Protocol" placeholder="Protocol" required>
-        <input name="Flow Duration" placeholder="Flow Duration" required>
-
-        <input name="Total Fwd Packets" placeholder="Total Fwd Packets" required>
-        <input name="Total Backward Packets" placeholder="Total Backward Packets" required>
-
-        <input name="Fwd Packets Length Total" placeholder="Fwd Packets Length Total" required>
-        <input name="Bwd Packets Length Total" placeholder="Bwd Packets Length Total" required>
-
-        <input name="Fwd Packet Length Max" placeholder="Fwd Packet Length Max" required>
-        <input name="Fwd Packet Length Min" placeholder="Fwd Packet Length Min" required>
-
-        <input name="Fwd Packet Length Mean" placeholder="Fwd Packet Length Mean" required>
-        <input name="Fwd Packet Length Std" placeholder="Fwd Packet Length Std" required>
-
-        <input name="Bwd Packet Length Max" placeholder="Bwd Packet Length Max" required>
-        <input name="Bwd Packet Length Min" placeholder="Bwd Packet Length Min" required>
-
-        <input name="Bwd Packet Length Mean" placeholder="Bwd Packet Length Mean" required>
-        <input name="Bwd Packet Length Std" placeholder="Bwd Packet Length Std" required>
-
-        <input name="Flow Bytes/s" placeholder="Flow Bytes/s" required>
-        <input name="Flow Packets/s" placeholder="Flow Packets/s" required>
-
-        <input name="Flow IAT Mean" placeholder="Flow IAT Mean" required>
-        <input name="Flow IAT Std" placeholder="Flow IAT Std" required>
-
-        <input name="Flow IAT Max" placeholder="Flow IAT Max" required>
-        <input name="Flow IAT Min" placeholder="Flow IAT Min" required>
+    <h1>Open-Set DDoS Detection (RPL)</h1>
+    <div class="desc">
+        Detect known DDoS attacks and identify unseen (novel) attack patterns using Open-Set Recognition.
     </div>
 
-    <button type="submit">Predict</button>
+    <form method="post" action="/predict">
 
-    {% if result %}
-    <div class="result">
-        Prediction: {{ result }}
-    </div>
-    {% endif %}
-</form>
+        <div class="grid">
+            <input name="Protocol" placeholder="Protocol">
+            <input name="Flow Duration" placeholder="Flow Duration">
+
+            <input name="Total Fwd Packets" placeholder="Total Fwd Packets">
+            <input name="Total Backward Packets" placeholder="Total Backward Packets">
+
+            <input name="Fwd Packets Length Total" placeholder="Fwd Packets Length Total">
+            <input name="Bwd Packets Length Total" placeholder="Bwd Packets Length Total">
+
+            <input name="Fwd Packet Length Max" placeholder="Fwd Packet Length Max">
+            <input name="Fwd Packet Length Min" placeholder="Fwd Packet Length Min">
+
+            <input name="Fwd Packet Length Mean" placeholder="Fwd Packet Length Mean">
+            <input name="Fwd Packet Length Std" placeholder="Fwd Packet Length Std">
+
+            <input name="Bwd Packet Length Max" placeholder="Bwd Packet Length Max">
+            <input name="Bwd Packet Length Min" placeholder="Bwd Packet Length Min">
+
+            <input name="Bwd Packet Length Mean" placeholder="Bwd Packet Length Mean">
+            <input name="Bwd Packet Length Std" placeholder="Bwd Packet Length Std">
+
+            <input name="Flow Bytes/s" placeholder="Flow Bytes/s">
+            <input name="Flow Packets/s" placeholder="Flow Packets/s">
+
+            <input name="Flow IAT Mean" placeholder="Flow IAT Mean">
+            <input name="Flow IAT Std" placeholder="Flow IAT Std">
+
+            <input name="Flow IAT Max" placeholder="Flow IAT Max">
+            <input name="Flow IAT Min" placeholder="Flow IAT Min">
+        </div>
+
+        <div class="buttons">
+            <button type="button" class="normal-btn" onclick="fillNormal()">Auto Fill Normal</button>
+            <button type="button" class="attack-btn" onclick="fillAttack()">Auto Fill Attack</button>
+        </div>
+
+        <div class="buttons">
+            <button type="submit" class="predict">Predict</button>
+        </div>
+
+        {% if result %}
+        <div class="result">
+            Prediction: {{ result }}
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+function fillNormal() {
+    document.querySelectorAll("input").forEach(input => {
+        input.value = Math.floor(Math.random() * 50) + 10;
+    });
+}
+
+function fillAttack() {
+    document.querySelectorAll("input").forEach(input => {
+        input.value = Math.floor(Math.random() * 1000) + 500;
+    });
+}
+</script>
 
 </body>
 </html>
